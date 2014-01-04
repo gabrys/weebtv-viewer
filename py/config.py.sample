@@ -1,0 +1,14 @@
+# Sample configuration for weebtv-viewer
+# Rename this file over to config.py and edit for your needs
+
+# Directory of the static files
+static_dir = '/path/to/weebtv-viewer/static'
+
+# WeebTV credentials
+weebtv_credentials = {
+    'username': 'your@weebtv.email',
+    'password': 'yourpassword',
+}
+
+# RTMPGW URL
+rtmpgw_url = 'http://localhost:8777/'

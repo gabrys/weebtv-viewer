@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>Weeb.TV</title>
+<style>
+
+body                       { background: #000; margin: 0; padding: 0 }
+#channel-list              { position: fixed; top: 0; right: 0; height: 100%; width: 334px }
+#channel-list ul           { padding: 0 3px; margin: 0; overflow: auto; height: 100%; width: 329px }
+#channel-list li           { position: relative; padding: 0 5px 5px 0; margin: 0; list-style: none }
+#channel-list li.current a { outline: 2px solid #fff }
+#channel-list li img.thumb { width: 311px; height: 175px; display: block }
+#channel-list li img.logo  { position: absolute; top: 0; left: 0; width: 80px; height: 80px; opacity: 0.8 }
+#player                    { position: fixed; height: 100%; width: calc(100% - 335px); border: 0; display: none; opacity: 0 }
+#go-to-grid a              { display: block; text-align: center; padding: 20px }
+
+body.channels #go-to-grid         { display: none; height: 154px }
+body.channels #channel-list       { position: static; width: auto }
+body.channels #channel-list ul    { position: static; width: auto }
+body.channels #channel-list ul li { float: left }
+
+</style>
+</head>
+<body class="channels">
+
+<section id="channel-list"></section>
+<iframe id="player" name="player" scrolling="no" style="width: calc(100%-335px)"></iframe>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+<script src="/api/channels.js"></script>
+<script src="/static/app.js"></script>
+
+</body>
+</html>
