@@ -22,7 +22,7 @@ Installation on Debian/Ubuntu (using integrated webserver)
 
 Get deps:
 
-    sudo apt-get install python-webpy
+    sudo apt-get install python-webpy python-bs4
 
 Additionally for python < 2.6:
 
