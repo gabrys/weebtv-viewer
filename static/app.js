@@ -8,7 +8,8 @@ var $body = $('body'),
   style = '',
   progName = location.href.toString().split('/')[6],
   $progLink,
-  controlSocket;
+  controlSocket,
+  premium;
 
 // FUNCTIONS
 
@@ -43,6 +44,13 @@ function channelRefresh() {
   $progLink.trigger('click');
 }
 
+function flashMessage(type, msg, time) {
+  var $msg = $('<div></div>').addClass(type).text(msg).hide();
+  $('#messages').append($msg);
+  $msg.fadeIn();
+  setTimeout(function () { $msg.fadeOut(); }, time);
+}
+
 function handleRemoteControl() {
   var controlSocket = new WebSocket("ws://localhost:1337/"),
     reconnectsLimit = 10;
@@ -56,14 +64,12 @@ function handleRemoteControl() {
   };
   controlSocket.onerror = function () {
     handleRemoteControl.reconnects = reconnectsLimit;
-    alert('No remote control support');
+    flashMessage('error', 'No remote control support', 3000);
   };
   controlSocket.onclose = function () {
     handleRemoteControl.reconnects += 1;
     if (handleRemoteControl.reconnects < reconnectsLimit) {
       handleRemoteControl(); // retry
-    } else {
-      controlSocket.onerror();
     }
   };
 }
@@ -80,7 +86,7 @@ function buildChannelList() {
       chLogo = ch.channel_logo_url,
       chHref = '/player/' + ch.cid + (ch.multibitrate === '1' ? '/hd.html' : '/sd.html'),
       $chLogo = $('<img alt="" class="logo"/>').attr('src', chLogo),
-      $chThumb = $('<img alt="" class="thumb"/>').attr('src', chThumb),
+      $chThumb = $('<img alt="" class="thumb"/>').attr('src', chLogo),
       $chLink = $('<a target="player"/>').attr('id', 'link-' + chName).attr('href', chHref).on('click', function (ev) {
           var $this = $(this);
 	  location.hash = $this.attr('id').replace('link-', '#play-');
@@ -99,11 +105,12 @@ function buildChannelList() {
 
     $newChannels.append($newCh);
   }
+  updateThumbs($newChannels);
 
   $newChannels.prepend($('<li id="go-to-grid"><a href="."><img src="/static/grid.png" alt="grid"></a></li>'));
 
   oldScrollTop = $channels && $channels.scrollTop();
-  currentLink = $channels && $channels.find('.current a').attr('id')
+  currentLink = $channels && $channels.find('.current a').attr('id');
 
   $channelsSection.html($newChannels);
   $newChannels.scrollTop(oldScrollTop);
@@ -119,6 +126,27 @@ function handleHash() {
   }
 }
 
+function updateThumbs($where) {
+  var chName;
+  $where = $where || $body;
+  if (typeof WeebTvThumbs !== 'undefined') {
+    for (chName in WeebTvThumbs) {
+      $('#link-' + chName, $where).find('.thumb').attr('src', WeebTvThumbs[chName]);
+    }
+  }
+}
+
+function updatePremium(newPremium) {
+  if (newPremium !== premium) {
+    premium = newPremium;
+    if (premium) {
+      flashMessage('success', 'Premium account', 3000);
+    } else {
+      flashMessage('error', 'No premium account', 3000);
+    }
+  }
+}
+
 buildChannelList();
 handleHash();
 handleRemoteControl();
@@ -126,5 +154,6 @@ handleRemoteControl();
 // Refresh list each minute
 setInterval(function () {
   $.get('/api/channels.js', buildChannelList);
+  $.get('/api/website.js');
 }, 60000);
 

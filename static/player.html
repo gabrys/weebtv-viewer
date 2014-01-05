@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><title>Player</title>
+<style>html, body, object { display: block; margin: 0; padding: 0; width: 100%; height: 100%; }</style>
+<script>
+  function refreshVideo() {
+    var p = document.player;
+    if (p.getTime() > 3) {
+      location.reload();
+    } else {
+      setTimeout(function () {
+        p.Play();
+      }, 2000);
+    }
+  }
+  function toggleFullscreen() {
+    var p = document.player;
+    p.fullscreen = !p.fullscreen;
+  }
+  function getVideoUrl() {
+    return location.href.toString().replace(/\.html$/, '.flv');
+  }
+  function writeVideo() { 
+    document.write([
+      '<object id="player" type="video/flv" data="',
+      getVideoUrl(),
+      '" onload="alert(\'visible\')" onEndOfStream="refreshVideo()" onClick="toggleFullscreen()">',
+      '</object>'
+      ].join('')
+    );
+  }
+</script>
+<script>writeVideo();</script>
+</html>

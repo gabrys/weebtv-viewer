@@ -3,11 +3,13 @@
 import subprocess as sp
 import random
 import sys
+import time
 import threading as th
 
 READSIZE = 100
 PORT_MIN = 10000
 PORT_MAX = 60000
+CONNECT_TIMEOUT = 10
 
 
 class RtmpgwException(Exception):
@@ -16,7 +18,7 @@ class RtmpgwException(Exception):
         self.returncode = returncode
 
 
-class RtmpgwThread(th.Thread):
+class RtmpgwWaitForEndThread(th.Thread):
     def run(self):
         cmd = self.cmd
 
@@ -24,15 +26,26 @@ class RtmpgwThread(th.Thread):
         # Then send 'q' to the command so it ends.
 
         while cmd.returncode is None:
+            cmd.active = True
             line = cmd.stderr.readline(READSIZE)
             if 'Closing connection' in line:
                 cmd.stdin.write('q\n')
                 cmd.wait()
 
 
-def start(cmd, port):
+class RtmpgwWatchdogThread(th.Thread):
+    def run(self):
+        time.sleep(CONNECT_TIMEOUT)
+
+        cmd = self.cmd
+        if cmd.returncode is None and not cmd.active:
+            cmd.stdin.write('q\n')
+            cmd.wait()
+
+
+def start(cmd, params):
     # Call rtmpgw
-    cmd = sp.Popen([cmd, '--sport', str(port)], stdin=sp.PIPE, stderr=sp.PIPE)
+    cmd = sp.Popen([cmd] + params, stdin=sp.PIPE, stderr=sp.PIPE)
 
     # Read until 'Streaming on' is displayed or until the command exits
     error = False
@@ -49,13 +62,19 @@ def start(cmd, port):
         raise RtmpgwException(output=''.join(error_out), returncode=cmd.returncode)
 
     # All good, let's do the rest in the background
-    bg = RtmpgwThread()
-    bg.cmd = cmd
-    bg.start()
+    waitForEnd = RtmpgwWaitForEndThread()
+    waitForEnd.cmd = cmd
+    waitForEnd.start()
 
+    # But if no-one connects to the port within some time, kill the process
+    cmd.active = False
+    watchdog = RtmpgwWatchdogThread()
+    watchdog.cmd = cmd
+    watchdog.start()
 
-def startOnRandomPort(cmd):
+def startOnRandomPort(cmd, params):
     port = random.randrange(PORT_MIN, PORT_MAX)
-    start(cmd, port)
+    params = params[:] + ['--sport', str(port)]
+    start(cmd, params)
     return port
 

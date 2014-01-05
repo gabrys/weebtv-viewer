@@ -18,16 +18,23 @@ body.channels #channel-list       { position: static; width: auto }
 body.channels #channel-list ul    { position: static; width: auto }
 body.channels #channel-list ul li { float: left }
 
+#messages             { position: fixed; bottom: 10%; left: 50%; margin-left: -200px; width: 400px; opacity: 0.8; text-align: center }
+#messages div         { display: inline-block; border-radius: 10px; padding: 10px 15px; margin: 5px; font-family: sans-serif; font-size: 20px; }
+#messages div.success { background: #36f; color: #fff }
+#messages div.error   { background: #f00; color: #fff }
+
 </style>
 </head>
 <body class="channels">
 
 <section id="channel-list"></section>
 <iframe id="player" name="player" scrolling="no" style="width: calc(100%-335px)"></iframe>
+<div id="messages"></div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 <script src="/api/channels.js"></script>
 <script src="/static/app.js"></script>
+<script src="/api/website.js" async></script>
 
 </body>
 </html>

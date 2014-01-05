@@ -16,7 +16,7 @@ class WeebTv(object):
         self.cache = {'channels': None, 'thumbs': None}
 
 
-    def __getChannelDict(self, thumbnails=False):
+    def __getChannelDict(self):
         if self.cache['channels']:
             return self.cache['channels']
 
@@ -24,23 +24,18 @@ class WeebTv(object):
         if self.username and self.password:
             data = urllib.urlencode({'username': self.username, 'userpassword': self.password})
 
-        if thumbnails:
-            thumbs, premium = self.__getDataFromWebsite()
-
         response = urllib2.urlopen(channelUrl, data)
         channels = [(chInfo['cid'], chInfo) for chInfo in json.loads(response.read()).itervalues()]
         channelDict = {}
         for channel in channels:
             chInfo = channel[1]
-            if thumbnails:
-                chInfo['channel_thumbnail_url'] = thumbs[chInfo['channel_name']]
             channelDict[str(channel[0])] = chInfo
 
         self.cache['channels'] = channelDict
         return channelDict
 
 
-    def __getDataFromWebsite(self):
+    def getDataFromWebsite(self):
         if self.cache['thumbs']:
             return self.cache['thumbs']
 
@@ -71,9 +66,9 @@ class WeebTv(object):
         return self.__getChannelDict()[str(channel)]
 
 
-    def getChannelList(self, thumbnails=False):
+    def getChannelList(self):
         chList = []
-        channelsInfo = self.__getChannelDict(thumbnails)
+        channelsInfo = self.__getChannelDict()
         for channel in sorted([(chInfo['channel_title'].replace('*', '').strip().lower(), chInfo) for chInfo in channelsInfo.itervalues()]):
             chList.append(channel[1])
         return chList
@@ -110,9 +105,4 @@ class WeebTv(object):
         params['url'] = url
         params['hd'] = hd
         return params
-
-
-    def isPremium(self):
-        thumbs, premium = self.__getDataFromWebsite()
-        return premium
 
