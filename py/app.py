@@ -7,6 +7,7 @@ except:
 import os, sys
 import web
 from weebtv import WeebTv
+import rtmpgw
 import config
 
 urls = (
@@ -60,8 +61,11 @@ class playerFlv:
         hd = mode == 'hd'
         weebtv = WeebTv(config.weebtv_credentials['username'], config.weebtv_credentials['password'])
         params = weebtv.getStreamChannelInfo(cid, hd)
+
         query = '?r=' + str(params['url']) + '&v=1&p=token&W=' + str(params['ticket'])
-        url = config.rtmpgw_url + query
+        rtmpgw_port = rtmpgw.startOnRandomPort(config.rtmpgw_bin)
+        url = 'http://' + config.rtmpgw_host + ':' + str(rtmpgw_port) + '/' + query
+
         print 'Redirecting to ' + url
         raise web.seeother(url)
 

@@ -10,5 +10,8 @@ weebtv_credentials = {
     'password': 'yourpassword',
 }
 
-# RTMPGW URL
-rtmpgw_url = 'http://localhost:8777/'
+# Hostname the rtmpgw will be accessed on
+rtmpgw_host = 'localhost'
+
+# rtmpgw path
+rtmpgw_bin = '/usr/sbin/rtmpgw'

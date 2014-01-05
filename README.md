@@ -10,7 +10,6 @@ Server-side:
 
 1. This Python web app (as wsgi or fastcgi app) with its dependencies
 2. Webserver: Apache, nginx, lighttpd, or anything else that talks fastcgi or wsgi
-3. rtmpgw (version 2.4 is required) daemon running on the same host (this can help: http://github.com/gabrys/rtmpgwd)
 
 Client-side:
 
@@ -51,10 +50,6 @@ Install rtmpdump package (with rtmpgw binary). It needs to be version 2.4:
 
     sudo apt-get install rtmpdump
 
-Start rtmpgw in a separate terminal window:
-
-    /usr/sbin/rtmpgw --sport 8777
-
 Install gecko-mediaplayer package to be able to view HTTP streams directly from a browser:
 
     sudo apt-get install gecko-mediaplayer
@@ -65,4 +60,4 @@ That was the minimal setup. Additionally you may want to:
 
 * enter your e-mail and password to the config.py to get the logged in and premium channels
 * configure the application to run from Apache or Lighttpd
-* use rtmpgwd to start rtmpgw as a daemon
+* if you access the application on a public interface update the rtmpgw_host in the config.py
