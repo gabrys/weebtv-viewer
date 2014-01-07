@@ -13,7 +13,7 @@ import config
 urls = (
     '/', 'staticIndex',
     '/static/app.js', 'staticApp',
-    '/static/grid.js', 'staticGrid',
+    '/static/grid.png', 'staticGrid',
     '/api/channels.js', 'apiChannels',
     '/api/website.js', 'apiWebsite',
     '/player/([0-9]+)/(hd|sd).html', 'playerHtml',
