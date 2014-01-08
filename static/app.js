@@ -4,6 +4,9 @@ var $body = $('body'),
   $channels,
   $channelsSection = $('#channel-list'),
   $player = $('#player'),
+  $settings = $('#settings'),
+  settingFlash = getSetting('flash', false),
+  settingHd = getSetting('hd', true),
   mode = 'channels',
   style = '',
   progName = location.href.toString().split('/')[6],
@@ -84,12 +87,15 @@ function buildChannelList() {
       chName = ch.channel_name,
       chThumb = ch.channel_thumbnail_url,
       chLogo = ch.channel_logo_url,
-      chHref = '/player/' + ch.cid + (ch.multibitrate === '1' ? '/hd.html' : '/sd.html'),
+      isHd = settingHd && (ch.multibitrate === '1'),
+      chHrefRtmp = '/player/' + ch.cid + (isHd ? '/hd.html' : '/sd.html'),
+      chHrefFlash = 'http://weeb.tv/mini-channel/' + chName,
+      chHref = settingFlash ? chHrefFlash : chHrefRtmp,
       $chLogo = $('<img alt="" class="logo"/>').attr('src', chLogo),
       $chThumb = $('<img alt="" class="thumb"/>').attr('src', chLogo),
       $chLink = $('<a target="player"/>').attr('id', 'link-' + chName).attr('href', chHref).on('click', function (ev) {
           var $this = $(this);
-	  location.hash = $this.attr('id').replace('link-', '#play-');
+          location.hash = $this.attr('id').replace('link-', '#play-');
           $channels.find('.current').removeClass('current');
           $this.parent().addClass('current');
           $player.show();
@@ -129,10 +135,16 @@ function handleHash() {
 function updateThumbs($where) {
   var chName;
   $where = $where || $body;
-  if (typeof WeebTvThumbs !== 'undefined') {
+  if (!window.WeebTvThumbs && localStorage.WeebTvThumbs) {
+    WeebTvThumbs = JSON.parse(localStorage.WeebTvThumbs);
+  }
+  if (window.WeebTvThumbs) {
     for (chName in WeebTvThumbs) {
       $('#link-' + chName, $where).find('.thumb').attr('src', WeebTvThumbs[chName]);
     }
+    setTimeout(function () {
+      localStorage.WeebTvThumbs = JSON.stringify(WeebTvThumbs);
+    }, 0);
   }
 }
 
@@ -147,9 +159,51 @@ function updatePremium(newPremium) {
   }
 }
 
+function setSetting(name, value) {
+  var key = 'WeebTv_' + name;
+  localStorage[key] = JSON.stringify(value);
+}
+
+function getSetting(name, def) {
+  var undef,
+      key = 'WeebTv_' + name;
+
+  if (localStorage[key]) {
+    return JSON.parse(localStorage[key]);
+  }
+
+  return def;
+}
+
+function handleSettings() {
+  $settings.find('button').on('click', function () {
+    var name, value;
+    $(this).toggleClass('on');
+    name = $(this).attr('name');
+    value = $(this).hasClass('on');
+
+    if (name === 'open') {
+      $settings.toggleClass('open');
+    } else {
+      setSetting(name, value);
+      location.reload();
+    }
+  });
+
+  if (settingHd) {
+    $settings.find('button[name="hd"]').addClass('on');
+  }
+
+  if (settingFlash) {
+    $settings.find('button[name="flash"]').addClass('on');
+    $settings.find('button[name="hd"]').hide();
+  }
+}
+
 buildChannelList();
 handleHash();
 handleRemoteControl();
+handleSettings();
 
 // Refresh list each minute
 setInterval(function () {

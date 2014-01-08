@@ -14,10 +14,12 @@ urls = (
     '/', 'staticIndex',
     '/static/app.js', 'staticApp',
     '/static/grid.png', 'staticGrid',
+    '/static/gear.png', 'staticGear',
     '/api/channels.js', 'apiChannels',
     '/api/website.js', 'apiWebsite',
     '/player/([0-9]+)/(hd|sd).html', 'playerHtml',
     '/player/([0-9]+)/(hd|sd).flv', 'playerFlv',
+    '/weebtv/login', 'weebtvLogin',
 )
 app = web.application(urls, globals())
 
@@ -38,6 +40,12 @@ class staticGrid:
         web.header('Content-type', 'image/png')
         web.header('Cache-control', 'max-age=36000')
         return open(config.static_dir + '/grid.png').read()
+
+class staticGear:
+    def GET(self):
+        web.header('Content-type', 'image/png')
+        web.header('Cache-control', 'max-age=36000')
+        return open(config.static_dir + '/gear.png').read()
 
 class playerHtml:
     def GET(self, cid, mode):
@@ -75,6 +83,14 @@ class apiWebsite:
         web.header('Cache-control', 'max-age=60')
         web.header('Content-type', 'text/javascript; charset=utf-8')
         return 'WeebTvThumbs = ' + json.dumps(thumbs) + '; updateThumbs(); updatePremium(' + json.dumps(premium) + ');'
+
+
+class weebtvLogin:
+    def GET(self):
+        script = 'login(' + json.dumps(config.weebtv_credentials['username']) + ',' + json.dumps(config.weebtv_credentials['password']) + ');'
+        web.header('Cache-control', 'max-age=600')
+        web.header('Content-type', 'text/html; charset=utf-8')
+        return open(config.static_dir + '/login.html').read() + '<script>' + script + '</script></html>'
 
 
 if __name__ == "__main__":

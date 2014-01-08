@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>Log in to WeebTv</title>
+</head>
+<body>
+<form method="POST" action="http://weeb.tv/account/login">
+  <input name="username" type="text">
+  <input name="userpassword" type="password">
+  <input type="submit">
+</form>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+<script>
+function login(username, password) {
+  $(function () {
+    $('input[name="username"]').val(username);
+    $('input[name="userpassword"]').val(password);
+    $('form').submit();
+  });
+}
+</script>
