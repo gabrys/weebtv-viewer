@@ -61,8 +61,8 @@ function handleRemoteControl() {
   handleRemoteControl.reconnects = handleRemoteControl.reconnects || 0;
 
   controlSocket.onmessage = function (msg) {
-    msg.data == 'CH_UP' && channelDown();
-    msg.data == 'CH_DOWN' && channelUp();
+    msg.data == 'CH_UP' && channelUp();
+    msg.data == 'CH_DOWN' && channelDown();
     msg.data == 'REFRESH' && channelRefresh();
   };
   controlSocket.onerror = function () {
@@ -200,10 +200,36 @@ function handleSettings() {
   }
 }
 
+function handleFullscreen() {
+  var diff = window.outerHeight - window.innerHeight,
+    fullscreen = diff < 5;
+  if (fullscreen) {
+    $body.addClass('fullscreen');
+  } else {
+    $body.removeClass('fullscreen');
+  }
+}
+
+function handleKeyboard() {
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Down') {
+      channelDown();
+      return false;
+    }
+    if (e.key === 'Up') {
+      channelUp();
+      return false;
+    }
+  });
+}
+
 buildChannelList();
 handleHash();
 handleRemoteControl();
+handleKeyboard();
 handleSettings();
+handleFullscreen();
+$(window).on('resize', handleFullscreen);
 
 // Refresh list each minute
 setInterval(function () {

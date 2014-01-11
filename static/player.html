@@ -12,10 +12,6 @@
       }, 2000);
     }
   }
-  function toggleFullscreen() {
-    var p = document.player;
-    p.fullscreen = !p.fullscreen;
-  }
   function getVideoUrl() {
     return location.href.toString().replace(/\.html$/, '.flv');
   }
@@ -23,7 +19,7 @@
     document.write([
       '<object id="player" type="video/flv" data="',
       getVideoUrl(),
-      '" onload="alert(\'visible\')" onEndOfStream="refreshVideo()" onClick="toggleFullscreen()">',
+      '" onload="alert(\'visible\')" onEndOfStream="refreshVideo()">',
       '</object>'
       ].join('')
     );

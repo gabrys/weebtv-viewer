@@ -18,6 +18,10 @@ body.channels #channel-list       { position: static; width: auto }
 body.channels #channel-list ul    { position: static; width: auto }
 body.channels #channel-list ul li { float: left }
 
+body.both.fullscreen #channel-list { display: none }
+body.both.fullscreen #player       { width: 100% }
+body.both.fullscreen #settings     { display: none }
+
 #messages             { position: fixed; bottom: 10%; left: 50%; margin-left: -200px; width: 400px; opacity: 0.8; text-align: center }
 #messages div         { display: inline-block; border-radius: 10px; padding: 10px 15px; margin: 5px; font-family: sans-serif; font-size: 20px; }
 #messages div.success { background: #36f; color: #fff }
