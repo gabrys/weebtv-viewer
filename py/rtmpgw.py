@@ -26,8 +26,10 @@ class RtmpgwWaitForEndThread(th.Thread):
         # Then send 'q' to the command so it ends.
 
         while cmd.returncode is None:
-            cmd.active = True
             line = cmd.stderr.readline(READSIZE)
+            cmd.poll()
+            if line:
+                cmd.active = True
             if 'Closing connection' in line:
                 cmd.stdin.write('q\n')
                 cmd.wait()
