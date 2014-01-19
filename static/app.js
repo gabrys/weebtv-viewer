@@ -1,18 +1,19 @@
 var $body = $('body'),
-  channels = {},
-  newChannelNames = [],
   $channels,
   $channelsSection = $('#channel-list'),
   $player = $('#player'),
   $settings = $('#settings'),
+  $settingButtons = $settings.find('button'),
+  $settingFlash = $settingButtons.filter('[name="flash"]'),
+  $settingHd = $settingButtons.filter('[name="hd"]'),
   settingFlash = getSetting('flash', false),
   settingHd = getSetting('hd', true),
   mode = 'channels',
   style = '',
   progName = location.href.toString().split('/')[6],
   $progLink,
-  controlSocket,
-  premium;
+  premium,
+  fullscreenTimeout;
 
 // FUNCTIONS
 
@@ -21,7 +22,7 @@ function scrollChannelListToLink($progLink) {
     scroll;
 
   scroll = $progItem.position().top - window.innerHeight / 2 + $progItem.height() / 2;
-  $channels.scrollTop($channels.scrollTop() + scroll)
+  $channels.scrollTop($channels.scrollTop() + scroll);
 
   $player.attr('src', $progLink.attr('href'));
 }
@@ -49,6 +50,21 @@ function flashMessage(type, msg, time) {
   setTimeout(function () { $msg.fadeOut(); }, time);
 }
 
+function clickChannel() {
+  var $this = $(this);
+  location.hash = $this.attr('id').replace('link-', '#play-');
+  $channels.find('.current').removeClass('current');
+  $this.parent().addClass('current');
+  $player.show();
+  $body.attr('class', 'both');
+  scrollChannelListToLink($this);
+  if (fullscreenTimeout) {
+    clearTimeout(fullscreenTimeout);
+  }
+  fullscreenTimeout = setTimeout(handleFullscreen, 10000);
+  return false;
+}
+
 function buildChannelList() {
   // CHANNEL LIST
 
@@ -65,16 +81,7 @@ function buildChannelList() {
       chHref = settingFlash ? chHrefFlash : chHrefRtmp,
       $chLogo = $('<img alt="" class="logo"/>').attr('src', chLogo),
       $chThumb = $('<img alt="" class="thumb"/>').attr('src', chLogo),
-      $chLink = $('<a target="player"/>').attr('id', 'link-' + chName).attr('href', chHref).on('click', function (ev) {
-          var $this = $(this);
-          location.hash = $this.attr('id').replace('link-', '#play-');
-          $channels.find('.current').removeClass('current');
-          $this.parent().addClass('current');
-          $player.show();
-          $body.attr('class', 'both');
-          scrollChannelListToLink($this);
-          return !ev.skipLoad;
-      }),
+      $chLink = $('<a target="player"/>').attr('id', 'link-' + chName).attr('href', chHref).on('click', clickChannel);
       $newCh = $('<li></li>');
 
     $newCh.append($chThumb);
@@ -148,7 +155,7 @@ function getSetting(name, def) {
 }
 
 function handleSettings() {
-  $settings.find('button').on('click', function () {
+  $settingButtons.on('click', function () {
     var name, value;
     $(this).toggleClass('on');
     name = $(this).attr('name');
@@ -163,12 +170,12 @@ function handleSettings() {
   });
 
   if (settingHd) {
-    $settings.find('button[name="hd"]').addClass('on');
+    $settingHd.addClass('on');
   }
 
   if (settingFlash) {
-    $settings.find('button[name="flash"]').addClass('on');
-    $settings.find('button[name="hd"]').hide();
+    $settingFlash.addClass('on');
+    $settingHd.hide();
   }
 }
 
@@ -191,6 +198,9 @@ function handleKeyboard() {
     if (e.key === 'Up') {
       channelUp();
       return false;
+    }
+    if (e.which === 82) {
+      $settingFlash.trigger('click');
     }
   });
 }
