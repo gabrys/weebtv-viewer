@@ -42,39 +42,11 @@ function channelUp() {
   $progLink.trigger('click');
 }
 
-function channelRefresh() {
-  var $progLink = $channels.find('.current').find('a');
-  $progLink.trigger('click');
-}
-
 function flashMessage(type, msg, time) {
   var $msg = $('<div></div>').addClass(type).text(msg).hide();
   $('#messages').append($msg);
   $msg.fadeIn();
   setTimeout(function () { $msg.fadeOut(); }, time);
-}
-
-function handleRemoteControl() {
-  var controlSocket = new WebSocket("ws://localhost:1337/"),
-    reconnectsLimit = 10;
-
-  handleRemoteControl.reconnects = handleRemoteControl.reconnects || 0;
-
-  controlSocket.onmessage = function (msg) {
-    msg.data == 'CH_UP' && channelUp();
-    msg.data == 'CH_DOWN' && channelDown();
-    msg.data == 'REFRESH' && channelRefresh();
-  };
-  controlSocket.onerror = function () {
-    handleRemoteControl.reconnects = reconnectsLimit;
-    flashMessage('error', 'No remote control support', 3000);
-  };
-  controlSocket.onclose = function () {
-    handleRemoteControl.reconnects += 1;
-    if (handleRemoteControl.reconnects < reconnectsLimit) {
-      handleRemoteControl(); // retry
-    }
-  };
 }
 
 function buildChannelList() {
@@ -225,7 +197,6 @@ function handleKeyboard() {
 
 buildChannelList();
 handleHash();
-handleRemoteControl();
 handleKeyboard();
 handleSettings();
 handleFullscreen();
