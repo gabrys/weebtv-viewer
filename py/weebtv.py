@@ -50,7 +50,7 @@ class WeebTv(object):
         thumbs = {}
         for channel in soup.select('ul.channels li'):
             name = channel.select('p > span > a')[0].text
-            url = channel.select('img')[0]['src']
+            url = channel.select('img')[0]['data-original']
             thumbs[name] = url
 
         if soup.select('li.icon.premium'):
