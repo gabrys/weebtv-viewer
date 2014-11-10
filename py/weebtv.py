@@ -29,8 +29,9 @@ class WeebTv(object):
         channelDict = {}
         for channel in channels:
             chInfo = channel[1]
+            if chInfo['channel_title'] is None:
+                chInfo['channel_title'] = chInfo['channel_name']
             channelDict[str(channel[0])] = chInfo
-
         self.cache['channels'] = channelDict
         return channelDict
 
