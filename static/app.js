@@ -13,7 +13,8 @@ var $body = $('body'),
   progName = location.href.toString().split('/')[6],
   $progLink,
   premium,
-  fullscreenTimeout;
+  fullscreenTimeout,
+  clickTimeout;
 
 // FUNCTIONS
 
@@ -24,7 +25,12 @@ function scrollChannelListToLink($progLink) {
   scroll = $progItem.position().top - window.innerHeight / 2 + $progItem.height() / 2;
   $channels.scrollTop($channels.scrollTop() + scroll);
 
-  $player.attr('src', $progLink.attr('href'));
+  if (clickTimeout) {
+    clearTimeout(clickTimeout);
+  }
+  clickTimeout = setTimeout(function () {
+    $player.attr('src', $progLink.attr('href'));
+  }, 200);
 }
 
 function channelDown() {
